@@ -1,0 +1,87 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+miniEngineClient
+</name>
+</assembly>
+<members>
+<member name="P:miniEngineClient.My.Resources.Resources.ResourceManager">
+	<summary>
+  Gibt die zwischengespeicherte ResourceManager-Instanz zurück, die von dieser Klasse verwendet wird.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.Culture">
+	<summary>
+  Überschreibt die CurrentUICulture-Eigenschaft des aktuellen Threads für alle
+  Ressourcenzuordnungen, die diese stark typisierte Ressourcenklasse verwenden.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.add_stepper_motor_26">
+	<summary>
+  Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.clear_curve_26">
+	<summary>
+  Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.end_26">
+	<summary>
+  Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.logout_26">
+	<summary>
+  Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.make_linear_26">
+	<summary>
+  Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.new_curve">
+	<summary>
+  Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.play_26">
+	<summary>
+  Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.save_26">
+	<summary>
+  Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.skip_to_start_26">
+	<summary>
+  Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.stepper_motor_26">
+	<summary>
+  Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.stop_26">
+	<summary>
+  Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.zoom_in_26">
+	<summary>
+  Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.zoom_out_26">
+	<summary>
+  Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+</summary>
+</member><member name="P:miniEngineClient.My.Resources.Resources.zoom_to_fit_26">
+	<summary>
+  Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+</summary>
+</member><member name="T:miniEngineClient.My.Resources.Resources">
+	<summary>
+  Eine stark typisierte Ressourcenklasse zum Suchen von lokalisierten Zeichenfolgen usw.
+</summary>
+</member><member name="P:miniEngineClient.TimelineGraph.ZoomFactor">
+	<summary>
+ Percent of increase and deacesae of the element per zoom step.
+ </summary>
+	<value></value>
+	<returns></returns>
+	<remarks>Percent of increase and deacesae of the element per zoom step.</remarks>
+</member>
+</members>
+</doc>

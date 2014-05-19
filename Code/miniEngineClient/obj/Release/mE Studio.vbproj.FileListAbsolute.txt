@@ -1,0 +1,18 @@
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\bin\Release\miniEngine Studio.exe.config
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\bin\Release\miniEngine Studio.exe.manifest
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\bin\Release\miniEngine Studio.application
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\bin\Release\miniEngine Studio.exe
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\bin\Release\miniEngine Studio.pdb
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\bin\Release\miniEngine Studio.xml
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\obj\Release\mEStudio.Dialog_Axis.resources
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\obj\Release\mEStudio.Form_About.resources
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\obj\Release\mEStudio.Form_Main.resources
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\obj\Release\mEStudio.Form_Splashscreen.resources
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\obj\Release\mEStudio.TimelineGraph.resources
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\obj\Release\mEStudio.Resources.resources
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\obj\Release\mE Studio.vbproj.GenerateResource.Cache
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\obj\Release\miniEngine Studio.exe.manifest
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\obj\Release\miniEngine Studio.application
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\obj\Release\miniEngine Studio.exe
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\obj\Release\miniEngine Studio.xml
+C:\Users\airic_2\Documents\Dropbox\Projects\2013-01 miniE 2\software\miniEngine Studio\miniEngine Studio\miniEngineClient\obj\Release\miniEngine Studio.pdb

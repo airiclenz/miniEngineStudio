@@ -1,0 +1,5 @@
+miniEngine Stusio is a Windows client for the miniEngine motion-control-system. 
+It allows creating multi-key-frame motor-paths using Bézier curves for precise 
+motion-control set-ups on multiple axes.
+
+Author: Airic Lenz
