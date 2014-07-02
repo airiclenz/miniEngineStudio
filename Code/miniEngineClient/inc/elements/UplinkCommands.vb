@@ -62,6 +62,8 @@ Public Class UplinkCommands
     Public Shared ReadOnly ClearMotorCurves As Byte = 15
     Public Shared ReadOnly AddMotorCurve As Byte = 16
     Public Shared ReadOnly CheckCurves As Byte = 17
+    Public Shared ReadOnly GetMotorCalibration As Byte = 18
+    Public Shared ReadOnly SetMotorCalibration As Byte = 19
 
 
 

@@ -122,6 +122,9 @@ Public Class TimelineGraph
     End Sub
 
 
+
+
+
     ' /////////////////////////////////////////////////////////////////////////
     ' //                                                                     //
     ' //    P U B L I C   F U N C T I O N S                                  //
@@ -368,6 +371,32 @@ Public Class TimelineGraph
         Next
     End Sub
 
+
+
+    ''' <summary>
+    ''' Returns the duration of the total setup (= duration of the axis with
+    ''' the longest duration) in Milliseconds
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function getTotalSetupDuration() As Double
+
+        Dim duration As Double = 0
+
+        ' loop all axes
+        For Each axis In mAxes
+
+            axis.Update()
+
+            If axis.MaximumX > duration Then
+                duration = axis.MaximumX
+            End If
+
+        Next
+
+        Return duration
+
+    End Function
 
 
 
@@ -706,6 +735,9 @@ Public Class TimelineGraph
 
 
     End Sub
+
+
+
 
 
 

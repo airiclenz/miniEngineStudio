@@ -1,0 +1,22 @@
+
+/////////////////////////////////////////////////////
+version:	1.0.1
+date:		2014-07-02
+
+Software:
+
+-	added functionality to control the motor-calibration
+	from the miniEngine Studio. This requires at least the
+	miniEngine v2 beta 6
+-	added the possibility to specifically assign one of the
+	motors to the defined curves / axes
+-	fixed some bugs in the manual move and positioning routines
+	of the Studio
+
+
+/////////////////////////////////////////////////////
+version:	1.0.0
+date:		2014-03-13
+
+- 	initial realease
+

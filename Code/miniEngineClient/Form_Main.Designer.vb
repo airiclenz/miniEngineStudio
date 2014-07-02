@@ -78,7 +78,8 @@ Partial Class Form_Main
         Me.btn_highContrast = New System.Windows.Forms.ToolStripButton()
         Me.btn_snap = New System.Windows.Forms.ToolStripButton()
         Me.Panel1 = New System.Windows.Forms.Panel()
-        Me.ToolStrip3 = New System.Windows.Forms.ToolStrip()
+        Me.graph = New mEStudio.TimelineGraph()
+        Me.btn_sendDataToME = New System.Windows.Forms.ToolStrip()
         Me.label_spacer = New System.Windows.Forms.ToolStripLabel()
         Me.btn_play = New System.Windows.Forms.ToolStripButton()
         Me.btn_stop = New System.Windows.Forms.ToolStripButton()
@@ -101,7 +102,6 @@ Partial Class Form_Main
         Me.Label1 = New System.Windows.Forms.Label()
         Me.edit_Y = New System.Windows.Forms.TextBox()
         Me.edit_X = New System.Windows.Forms.TextBox()
-        Me.graph = New mEStudio.TimelineGraph()
         Me.MenuStrip1.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         CType(Me.SplitContainer2, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -115,7 +115,7 @@ Partial Class Form_Main
         Me.ToolStrip2.SuspendLayout()
         Me.ToolStrip1.SuspendLayout()
         Me.Panel1.SuspendLayout()
-        Me.ToolStrip3.SuspendLayout()
+        Me.btn_sendDataToME.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -314,7 +314,7 @@ Partial Class Form_Main
         'SplitContainer2.Panel1
         '
         Me.SplitContainer2.Panel1.Controls.Add(Me.SplitContainer1)
-        Me.SplitContainer2.Panel1.Controls.Add(Me.ToolStrip3)
+        Me.SplitContainer2.Panel1.Controls.Add(Me.btn_sendDataToME)
         '
         'SplitContainer2.Panel2
         '
@@ -342,7 +342,7 @@ Partial Class Form_Main
         Me.SplitContainer1.Panel2.Controls.Add(Me.ToolStrip1)
         Me.SplitContainer1.Panel2.Controls.Add(Me.Panel1)
         Me.SplitContainer1.Size = New System.Drawing.Size(1054, 360)
-        Me.SplitContainer1.SplitterDistance = 180
+        Me.SplitContainer1.SplitterDistance = 220
         Me.SplitContainer1.TabIndex = 6
         '
         'ToolStrip2
@@ -352,7 +352,7 @@ Partial Class Form_Main
         Me.ToolStrip2.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.btn_addAxis, Me.btn_editAxis, Me.ToolStripSeparator6, Me.btn_deleteAxis, Me.ToolStripSeparator5, Me.btn_visible})
         Me.ToolStrip2.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip2.Name = "ToolStrip2"
-        Me.ToolStrip2.Size = New System.Drawing.Size(180, 25)
+        Me.ToolStrip2.Size = New System.Drawing.Size(220, 25)
         Me.ToolStrip2.TabIndex = 3
         Me.ToolStrip2.Text = "ToolStrip2"
         '
@@ -418,7 +418,7 @@ Partial Class Form_Main
         Me.ListView_Axes.Location = New System.Drawing.Point(3, 28)
         Me.ListView_Axes.MultiSelect = False
         Me.ListView_Axes.Name = "ListView_Axes"
-        Me.ListView_Axes.Size = New System.Drawing.Size(174, 299)
+        Me.ListView_Axes.Size = New System.Drawing.Size(214, 299)
         Me.ListView_Axes.StateImageList = Me.ImageList_axes
         Me.ListView_Axes.TabIndex = 1
         Me.ListView_Axes.UseCompatibleStateImageBehavior = False
@@ -431,7 +431,7 @@ Partial Class Form_Main
         Me.ToolStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.btn_addSegment, Me.ToolStripSeparator7, Me.btn_DeleteSegment, Me.ToolStripSeparator3, Me.btn_zoomIn, Me.btn_zoomOut, Me.btn_ZoomToFit, Me.ToolStripSeparator1, Me.btn_linear, Me.btn_locked, Me.ToolStripSeparator2, Me.btn_showHelper, Me.btn_highContrast, Me.btn_snap})
         Me.ToolStrip1.Location = New System.Drawing.Point(0, 0)
         Me.ToolStrip1.Name = "ToolStrip1"
-        Me.ToolStrip1.Size = New System.Drawing.Size(870, 25)
+        Me.ToolStrip1.Size = New System.Drawing.Size(830, 25)
         Me.ToolStrip1.TabIndex = 6
         Me.ToolStrip1.Text = "ToolStrip1"
         '
@@ -574,21 +574,36 @@ Partial Class Form_Main
         Me.Panel1.Cursor = System.Windows.Forms.Cursors.Cross
         Me.Panel1.Location = New System.Drawing.Point(3, 28)
         Me.Panel1.Name = "Panel1"
-        Me.Panel1.Size = New System.Drawing.Size(864, 299)
+        Me.Panel1.Size = New System.Drawing.Size(824, 299)
         Me.Panel1.TabIndex = 4
         '
-        'ToolStrip3
+        'graph
         '
-        Me.ToolStrip3.BackColor = System.Drawing.Color.Transparent
-        Me.ToolStrip3.Dock = System.Windows.Forms.DockStyle.Bottom
-        Me.ToolStrip3.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
-        Me.ToolStrip3.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.label_spacer, Me.btn_play, Me.btn_stop, Me.btn_toStart, Me.ToolStripSeparator4, Me.btn_SendData, Me.ToolStripSeparator9, Me.btn_moveToPos, Me.ToolStripLabel1, Me.ToolStripLabel_unit, Me.edit_moveDistance, Me.btn_moveRight, Me.btn_moveLeft, Me.btn_home, Me.ToolStripSeparator8})
-        Me.ToolStrip3.Location = New System.Drawing.Point(0, 360)
-        Me.ToolStrip3.Name = "ToolStrip3"
-        Me.ToolStrip3.RightToLeft = System.Windows.Forms.RightToLeft.Yes
-        Me.ToolStrip3.Size = New System.Drawing.Size(1054, 33)
-        Me.ToolStrip3.TabIndex = 5
-        Me.ToolStrip3.Text = "ToolStrip3"
+        Me.graph.AutoUpdate = True
+        Me.graph.CurveLineWidth = 2.0!
+        Me.graph.FPS = 25
+        Me.graph.HighContrast = False
+        Me.graph.Location = New System.Drawing.Point(3, 3)
+        Me.graph.Name = "graph"
+        Me.graph.RulerColor = System.Drawing.Color.Silver
+        Me.graph.ShowHelper = True
+        Me.graph.Size = New System.Drawing.Size(595, 247)
+        Me.graph.SnapToUnit = False
+        Me.graph.TabIndex = 0
+        Me.graph.ZoomFactor = 10
+        '
+        'btn_sendDataToME
+        '
+        Me.btn_sendDataToME.BackColor = System.Drawing.Color.Transparent
+        Me.btn_sendDataToME.Dock = System.Windows.Forms.DockStyle.Bottom
+        Me.btn_sendDataToME.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden
+        Me.btn_sendDataToME.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.label_spacer, Me.btn_play, Me.btn_stop, Me.btn_toStart, Me.ToolStripSeparator4, Me.btn_SendData, Me.ToolStripSeparator9, Me.btn_moveToPos, Me.ToolStripLabel1, Me.ToolStripLabel_unit, Me.edit_moveDistance, Me.btn_moveRight, Me.btn_moveLeft, Me.btn_home, Me.ToolStripSeparator8})
+        Me.btn_sendDataToME.Location = New System.Drawing.Point(0, 360)
+        Me.btn_sendDataToME.Name = "btn_sendDataToME"
+        Me.btn_sendDataToME.RightToLeft = System.Windows.Forms.RightToLeft.Yes
+        Me.btn_sendDataToME.Size = New System.Drawing.Size(1054, 33)
+        Me.btn_sendDataToME.TabIndex = 5
+        Me.btn_sendDataToME.Text = "ToolStrip3"
         '
         'label_spacer
         '
@@ -793,21 +808,6 @@ Partial Class Form_Main
         Me.edit_X.Size = New System.Drawing.Size(100, 20)
         Me.edit_X.TabIndex = 0
         '
-        'graph
-        '
-        Me.graph.AutoUpdate = True
-        Me.graph.CurveLineWidth = 2.0!
-        Me.graph.FPS = 25
-        Me.graph.HighContrast = False
-        Me.graph.Location = New System.Drawing.Point(3, 3)
-        Me.graph.Name = "graph"
-        Me.graph.RulerColor = System.Drawing.Color.Silver
-        Me.graph.ShowHelper = True
-        Me.graph.Size = New System.Drawing.Size(595, 247)
-        Me.graph.SnapToUnit = False
-        Me.graph.TabIndex = 0
-        Me.graph.ZoomFactor = 10
-        '
         'Form_Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -843,8 +843,8 @@ Partial Class Form_Main
         Me.ToolStrip1.ResumeLayout(False)
         Me.ToolStrip1.PerformLayout()
         Me.Panel1.ResumeLayout(False)
-        Me.ToolStrip3.ResumeLayout(False)
-        Me.ToolStrip3.PerformLayout()
+        Me.btn_sendDataToME.ResumeLayout(False)
+        Me.btn_sendDataToME.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
         Me.ResumeLayout(False)
@@ -913,7 +913,7 @@ Partial Class Form_Main
     Friend WithEvents ToolStripMenuItem4 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents ToolStripMenuItem5 As System.Windows.Forms.ToolStripSeparator
     Friend WithEvents RegistermepFilesWithPathDesignerToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
-    Friend WithEvents ToolStrip3 As System.Windows.Forms.ToolStrip
+    Friend WithEvents btn_sendDataToME As System.Windows.Forms.ToolStrip
     Friend WithEvents label_spacer As System.Windows.Forms.ToolStripLabel
     Friend WithEvents btn_play As System.Windows.Forms.ToolStripButton
     Friend WithEvents btn_stop As System.Windows.Forms.ToolStripButton

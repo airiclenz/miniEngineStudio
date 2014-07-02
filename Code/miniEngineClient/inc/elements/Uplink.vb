@@ -44,11 +44,8 @@ Public Class Uplink
     Private mCommandSent As Boolean
 
     Private mCurveLimit As Short
-    Private mAxisCount As Short
-    Private mAxesTypes As List(Of Byte)
-    Private mMotorPositions As List(Of Single)
 
-
+    Private mAxes As List(Of Axis)
 
 
     Public Event ConnectionEstablished(ByVal sender As System.Object)
@@ -68,9 +65,8 @@ Public Class Uplink
         mPort = comPort
 
         mCurveLimit = 0
-        mAxisCount = 0
-        mAxesTypes = New List(Of Byte)
-        mMotorPositions = New List(Of Single)
+
+        mAxes = New List(Of Axis)
 
         mCommandSent = False
         mDataRequest = UplinkCommands.REQUEST_NONE
@@ -117,9 +113,6 @@ Public Class Uplink
     ' ==================================================================
     Public Function ConnectMiniEngine() As Boolean
 
-        mAxisCount = 0
-
-
         ' try to open the com port if it is closed
         If Not mPort.IsOpen Then
             mPort.Open()
@@ -160,26 +153,40 @@ Public Class Uplink
             ' request the axis count from the miniEngine
             res = SendRequest(UplinkCommands.GetMotorCount, UplinkCommands.REQUEST_INT16)
             If res IsNot Nothing Then
-                mAxisCount = CShort(res)
-                mAxesTypes.Clear()
-                mMotorPositions.Clear()
+
+                Dim axisCount = CShort(res)
+                mAxes.Clear()
 
                 ' loop all axes 
-                For i As Byte = 0 To CByte(mAxisCount - 1)
+                For i As Byte = 0 To CByte(axisCount - 1)
 
                     ' selecte the current axis
                     If SendCommand(UplinkCommands.SetActiveMotor, i) Then
 
+                        ' add a new axis
+                        mAxes.Add(New Axis())
+
+                        ' set the name of the nw Axis (use the same name as used in the miniEngine)
+                        mAxes.Last.Name = "Motor " + CStr(i + 1)
+                        mAxes.Last.MotorNumber = i
+                        mAxes.Last.Used = False
+
                         'request the axis type
                         res = SendRequest(UplinkCommands.GetMotorType, UplinkCommands.REQUEST_INT8)
                         If res IsNot Nothing Then
-                            mAxesTypes.Add(CByte(res))
+                            mAxes.Last.Type = CByte(res)
                         End If
 
                         'request the motor position
                         res = SendRequest(UplinkCommands.GetMotorPosition, UplinkCommands.REQUEST_FLOAT)
                         If res IsNot Nothing Then
-                            mMotorPositions.Add(CSng(res))
+                            mAxes.Last.MotorPosition = CSng(res)
+                        End If
+
+                        'request the motor calibration
+                        res = SendRequest(UplinkCommands.GetMotorCalibration, UplinkCommands.REQUEST_FLOAT)
+                        If res IsNot Nothing Then
+                            mAxes.Last.Calibration = CSng(res)
                         End If
 
                     End If
@@ -207,12 +214,21 @@ Public Class Uplink
     End Function
 
 
+
     ' ==================================================================
     Public Sub ClearInputBuffer()
         mBuffer.Clear()
     End Sub
 
 
+    ' ==================================================================
+    Public Sub MarkAllMotorsUnused()
+
+        For Each motor In mAxes
+            motor.Used = False
+        Next
+
+    End Sub
 
     ' ==================================================================
     Public Function SendCommand(ByVal commandCode As Byte) As Boolean
@@ -240,6 +256,31 @@ Public Class Uplink
         End If
 
         mCommandSent = False
+        Return False
+
+    End Function
+
+    ' ==================================================================
+    Public Function SendCalibration(ByVal motorIndex As Integer, ByVal value As Single) As Boolean
+
+        If mConnected Then
+
+            ' set the active motor
+            If SendCommand(UplinkCommands.SetActiveMotor, CByte(motorIndex)) Then
+
+                If SendCommand(UplinkCommands.SetMotorCalibration, value) Then
+
+                    ' set the local calibration value as well as it was set now
+                    mAxes(motorIndex).Calibration = value
+
+                    Return True
+
+                End If
+
+            End If
+
+        End If
+
         Return False
 
     End Function
@@ -406,12 +447,14 @@ Public Class Uplink
 
 
     ' ==================================================================
-    Public Sub MotorMove(ByVal index As Integer, ByVal distance As Single)
+    Public Sub MotorMove(ByVal motorNum As Integer, ByVal distance As Single)
 
-        If index >= 0 And index < mMotorPositions.Count Then
+        Dim ax As Axis = Axis.GetAxisWithMotorNumber(motorNum, mAxes)
 
-            mMotorPositions(index) = mMotorPositions(index) + distance
-            SendCommand(UplinkCommands.MoveMotorToPosition, mMotorPositions(index))
+        If ax IsNot Nothing Then
+
+            ax.MotorPosition = ax.MotorPosition + distance
+            SendCommand(UplinkCommands.MoveMotorToPosition, ax.MotorPosition)
 
         End If
 
@@ -489,24 +532,16 @@ Public Class Uplink
 
 
     ' ==================================================================
-    Public ReadOnly Property AxisTypes As List(Of Byte)
+    Public ReadOnly Property Axes As List(Of Axis)
         Get
-            Return mAxesTypes
-        End Get
-    End Property
-
-
-    ' ==================================================================
-    Public ReadOnly Property MotorPositions As List(Of Single)
-        Get
-            Return mMotorPositions
+            Return mAxes
         End Get
     End Property
 
     ' ==================================================================
     Public ReadOnly Property AxesCount As Integer
         Get
-            Return mAxisCount
+            Return mAxes.Count
         End Get
     End Property
 
@@ -738,7 +773,7 @@ Public Class Uplink
             mConnected = False
             RaiseEvent ConnectionLost(Me)
         End Try
-        
+
     End Sub
 
 
@@ -762,7 +797,7 @@ Public Class Uplink
             mConnected = False
             RaiseEvent ConnectionLost(Me)
         End Try
-        
+
     End Sub
 
 

@@ -22,10 +22,26 @@
 Option Strict On
 Option Explicit On
 
+
+Imports System
+Imports System.Globalization
+
+
 ' ==================================================================
 ' ==================================================================
 ' ==================================================================
 Public Class Utils
+
+
+
+    ' =========================================================================
+    Public Shared Function GetDecimalSeperator() As String
+
+        ' get the local comma seperator
+        Dim ci As System.Globalization.CultureInfo = System.Threading.Thread.CurrentThread.CurrentCulture
+        Return ci.NumberFormat.CurrencyDecimalSeparator
+
+    End Function
 
 
     ' =========================================================================

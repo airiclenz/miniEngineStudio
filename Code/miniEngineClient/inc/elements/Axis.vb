@@ -28,7 +28,8 @@ Option Explicit On
 <Serializable()>
 Public Class Axis
 
-    Private mMiniEAxis As Byte
+    Private mMotorNumber As Integer
+    Private mUsed As Boolean
 
     Private mName As String
     Private mType As Byte
@@ -49,6 +50,7 @@ Public Class Axis
     Private mScreenFactorY As Double
 
     Private mMotorPosition As Single
+    Private mCalibration As Single
 
     Private mDirty As Boolean
 
@@ -68,13 +70,14 @@ Public Class Axis
     ''' <remarks></remarks>
     Public Sub New()
 
-        mMiniEAxis = Nothing
-
         mName = "New Axis"
+        mMotorNumber = -1
+        mUsed = False
 
         mCurves = New List(Of QuadBezier)
         mColor = Color.Orange
         mType = AxisType.Linear
+        mCalibration = 500
         mVisible = True
         mSelected = False
 
@@ -98,10 +101,13 @@ Public Class Axis
     Public Sub New(ByVal color As Color, ByVal type As Byte)
 
         mName = "New Axis"
+        mMotorNumber = -1
+        mUsed = False
 
         mCurves = New List(Of QuadBezier)
         mColor = color
         mType = type
+        mCalibration = 500
         mVisible = True
         mSelected = False
 
@@ -320,6 +326,28 @@ Public Class Axis
 
 
 
+    ' ==================================================================
+    ''' <summary>
+    ''' Returns the axis from the provided list that has the given motorNumber
+    ''' </summary>
+    ''' <param name="motorNumber"></param>
+    ''' <param name="axes"></param>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Shared Function GetAxisWithMotorNumber(ByVal motorNumber As Integer, ByVal axes As List(Of Axis)) As Axis
+
+        For Each axis In axes
+            If axis.MotorNumber = motorNumber Then
+                Return axis
+            End If
+        Next
+
+        Return Nothing
+
+    End Function
+
+
+
     ' /////////////////////////////////////////////////////////////////////////
     ' //                                                                     //
     ' //    P R O P E R T I E S                                              //
@@ -327,13 +355,39 @@ Public Class Axis
     ' /////////////////////////////////////////////////////////////////////////
 
 
+
     ' =========================================================================
-    Public Property miniEngineAxis As Byte
+    ''' <summary>
+    ''' Get or set if this axis is in use or not
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property Used As Boolean
         Get
-            Return mMiniEAxis
+            Return mUsed
         End Get
-        Set(ByVal value As Byte)
-            mMiniEAxis = value
+        Set(ByVal value As Boolean)
+            mUsed = value
+            mDirty = True
+        End Set
+    End Property
+
+
+    ' =========================================================================
+    ''' <summary>
+    ''' Get or sets the "used" flag of the axis
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property MotorNumber As Integer
+        Get
+            Return mMotorNumber
+        End Get
+        Set(ByVal value As Integer)
+            mMotorNumber = value
+            mDirty = True
         End Set
     End Property
 
@@ -407,6 +461,25 @@ Public Class Axis
             mDirty = True
         End Set
     End Property
+
+
+    ' =========================================================================
+    ''' <summary>
+    ''' Retruns or sets the axis's Calibration value
+    ''' </summary>
+    ''' <value></value>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Property Calibration As Single
+        Get
+            Return mCalibration
+        End Get
+        Set(ByVal value As Single)
+            mCalibration = value
+            mDirty = True
+        End Set
+    End Property
+
 
     ' =========================================================================
     ''' <summary>

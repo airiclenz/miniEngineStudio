@@ -33,7 +33,7 @@ Public Class Form_Main
 
     Public Const Version As Byte = 1
     Public Const SubVersion As Byte = 0
-    Public Const SubSubVersion As Byte = 0
+    Public Const SubSubVersion As Byte = 1
 
     Private Const Title As String = "miniEngine Studio"
 
@@ -134,6 +134,7 @@ Public Class Form_Main
         End If
 
         graph.Update()
+
 
         Cursor = Cursors.Default
 
@@ -248,7 +249,8 @@ Public Class Form_Main
             Dialog_Axis.Axis.Color = mAxisColors(ListView_Axes.Items.Count)
 
             If graph.Axes.Count < mUplink.AxesCount Then
-                Dialog_Axis.Axis.Type = mUplink.AxisTypes(graph.Axes.Count)
+                Dialog_Axis.Axis.Type = mUplink.Axes(graph.Axes.Count).Type
+                Dialog_Axis.Axis.Calibration = mUplink.Axes(graph.Axes.Count).Calibration
             Else
                 Dialog_Axis.Axis.Type = AxisType.Linear
             End If
@@ -478,6 +480,15 @@ Public Class Form_Main
             If MessageBox.Show("Do you really want to delete the Axis """ + ListView_Axes.SelectedItems(0).Text + """?",
                                "Question", MessageBoxButtons.OKCancel, MessageBoxIcon.Question) = DialogResult.OK Then
 
+                ' free the motor that this axes used
+                For Each motor As Axis In mUplink.Axes
+                    If motor.MotorNumber = graph.Axes(ListView_Axes.SelectedIndices(0)).MotorNumber Then
+                        ' set the motor free!
+                        motor.Used = False
+                    End If
+                Next
+
+
                 ' remove the axis
                 graph.Axes.RemoveAt(ListView_Axes.SelectedIndices(0))
                 ' repaint the axes list and select the old axis
@@ -515,6 +526,9 @@ Public Class Form_Main
 
     ' =========================================================================
     Private Sub OpenToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles OpenToolStripMenuItem.Click
+
+        mUplink.MarkAllMotorsUnused()
+
         If LoadFile() Then
             SaveToolStripMenuItem.Enabled = True
             My.Settings.LastFile = mFilename
@@ -667,17 +681,16 @@ Public Class Form_Main
     ' ==================================================================
     Private Sub btn_home_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_home.Click
 
-        Dim idx As Integer = ListView_Axes.SelectedIndices(0)
+        Dim motorNum As Integer = graph.Axes(ListView_Axes.SelectedIndices(0)).MotorNumber
 
         ' move back to home
         If mUplink.SendCommand(UplinkCommands.MoveMotorToPosition, 0) Then
-            mUplink.MotorPositions(idx) = 0
-            graph.Axes(idx).MotorPosition = 0
+            mUplink.Axes(motorNum).MotorPosition = 0
+            graph.Axes(motorNum).MotorPosition = 0
 
             graph.Update()
 
         End If
-
 
     End Sub
 
@@ -685,7 +698,7 @@ Public Class Form_Main
     ' ==================================================================
     Private Sub btn_moveLeft_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_moveLeft.Click
 
-        Dim idx As Integer = ListView_Axes.SelectedIndices(0)
+        Dim motorNum As Integer = graph.Axes(ListView_Axes.SelectedIndices(0)).MotorNumber
         Dim dist As Single
 
 
@@ -694,18 +707,21 @@ Public Class Form_Main
 
         If res IsNot Nothing Then
 
-            mUplink.MotorPositions(idx) = CSng(res)
-            graph.Axes(idx).MotorPosition = CSng(res)
+            Dim uplinkAxis As Axis = Axis.GetAxisWithMotorNumber(motorNum, mUplink.Axes)
+            Dim graphAxis As Axis = Axis.GetAxisWithMotorNumber(motorNum, graph.Axes)
+
+            uplinkAxis.MotorPosition = CSng(res)
+            graph.Axes(motorNum).MotorPosition = CSng(res)
 
             edit_moveDistance.Text = edit_moveDistance.Text.Replace(".", mDecimalSeparator)
             edit_moveDistance.Text = edit_moveDistance.Text.Replace(",", mDecimalSeparator)
 
             If Single.TryParse(edit_moveDistance.Text, dist) Then
 
-                mUplink.MotorMove(idx, -dist)
+                mUplink.MotorMove(motorNum, -dist)
 
-                mUplink.MotorPositions(idx) = mUplink.MotorPositions(idx) - dist
-                graph.Axes(idx).MotorPosition = graph.Axes(idx).MotorPosition - dist
+                uplinkAxis.MotorPosition = uplinkAxis.MotorPosition - dist
+                graphAxis.MotorPosition = graphAxis.MotorPosition - dist
 
             End If
 
@@ -720,7 +736,7 @@ Public Class Form_Main
     ' ==================================================================
     Private Sub btn_moveRight_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_moveRight.Click
 
-        Dim idx As Integer = ListView_Axes.SelectedIndices(0)
+        Dim motorNum As Integer = graph.Axes(ListView_Axes.SelectedIndices(0)).MotorNumber
         Dim dist As Single
 
         ' update the current motor position
@@ -728,18 +744,19 @@ Public Class Form_Main
 
         If res IsNot Nothing Then
 
-            mUplink.MotorPositions(idx) = CSng(res)
-            graph.Axes(idx).MotorPosition = CSng(res)
+            Dim uplinkAxis As Axis = Axis.GetAxisWithMotorNumber(motorNum, mUplink.Axes)
+            Dim graphAxis As Axis = Axis.GetAxisWithMotorNumber(motorNum, graph.Axes)
+
+            uplinkAxis.MotorPosition = CSng(res)
+            uplinkAxis.MotorPosition = CSng(res)
 
             edit_moveDistance.Text = edit_moveDistance.Text.Replace(".", mDecimalSeparator)
             edit_moveDistance.Text = edit_moveDistance.Text.Replace(",", mDecimalSeparator)
 
             If Single.TryParse(edit_moveDistance.Text, dist) Then
 
-                
-                mUplink.MotorMove(idx, dist)
-                mUplink.MotorPositions(idx) = mUplink.MotorPositions(idx) + dist
-                graph.Axes(idx).MotorPosition = graph.Axes(idx).MotorPosition + dist
+                mUplink.MotorMove(motorNum, dist)
+                graphAxis.MotorPosition = graphAxis.MotorPosition + dist
 
             End If
 
@@ -752,26 +769,24 @@ Public Class Form_Main
     ' ==================================================================
     Private Sub btn_moveToPos_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_moveToPos.Click
 
-        Dim idx As Integer = ListView_Axes.SelectedIndices(0)
-        Dim dist As Single
+        Dim motorNum As Integer = graph.Axes(ListView_Axes.SelectedIndices(0)).MotorNumber
+        Dim position As Single
 
         ' update the current motor position
         Dim res As Object = mUplink.SendRequest(UplinkCommands.GetMotorPosition, UplinkCommands.REQUEST_FLOAT)
 
         If res IsNot Nothing Then
 
-            mUplink.MotorPositions(idx) = CSng(res)
-            graph.Axes(idx).MotorPosition = CSng(res)
+            Dim uplinkAxis As Axis = Axis.GetAxisWithMotorNumber(motorNum, mUplink.Axes)
+            Dim graphAxis As Axis = Axis.GetAxisWithMotorNumber(motorNum, graph.Axes)
 
             edit_moveDistance.Text = edit_moveDistance.Text.Replace(".", mDecimalSeparator)
             edit_moveDistance.Text = edit_moveDistance.Text.Replace(",", mDecimalSeparator)
 
-            If Single.TryParse(edit_moveDistance.Text, dist) Then
+            If Single.TryParse(edit_moveDistance.Text, position) Then
 
-                mUplink.MotorMove(idx, dist - mUplink.MotorPositions(idx))
-
-                mUplink.MotorPositions(idx) = dist - mUplink.MotorPositions(idx)
-                graph.Axes(idx).MotorPosition = dist - mUplink.MotorPositions(idx)
+                mUplink.MotorMove(motorNum, position - uplinkAxis.MotorPosition)
+                graphAxis.MotorPosition = position
 
             End If
 
@@ -789,32 +804,26 @@ Public Class Form_Main
 
         For Each axis In graph.Axes
 
-            ' Are there curves defined
-            If axis.Curves.Count > 0 Then
+            If axis.MotorNumber <> -1 Then
 
-                ' where to go to to finally?
-                Dim pos = axis.Curves(0).Point1.Y
+                ' Are there curves defined
+                If axis.Curves.Count > 0 Then
 
-                If mUplink.SendCommand(UplinkCommands.MoveMotorToPosition, CSng(pos)) Then
+                    ' where to go to to finally?
+                    Dim pos = axis.Curves(0).Point1.Y
 
-                    mUplink.MotorPositions(counter) = CSng(pos)
+                    Dim uplinkAxis As Axis = axis.GetAxisWithMotorNumber(axis.MotorNumber, mUplink.Axes)
+                    mUplink.MotorMove(axis.MotorNumber, CSng(pos - uplinkAxis.MotorPosition))
                     graph.Axes(counter).MotorPosition = CSng(pos)
 
                 End If
 
             End If
 
-
-            ' stop here if we reached the last real axes
-            counter = counter + 1
-
-            If counter = mUplink.AxesCount Then
-                Exit For
-            End If
-
         Next
 
     End Sub
+
 
 
     ' ==================================================================
@@ -844,6 +853,15 @@ Public Class Form_Main
 
     End Sub
 
+
+    ' ==================================================================
+    Private Sub btn_SendData_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_SendData.Click
+        If (SendSetupData()) Then
+            MessageBox.Show("Uploaded the data successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Else
+            MessageBox.Show("Error during the data upload!" + vbNewLine + "Please try again.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Warning)
+        End If
+    End Sub
 
 
     ' /////////////////////////////////////////////////////////////////////////
@@ -889,6 +907,7 @@ Public Class Form_Main
         End Try
 
     End Sub
+
 
 
     ' ==================================================================
@@ -954,6 +973,73 @@ Public Class Form_Main
 
 
 
+    ' =========================================================================
+    ''' <summary>
+    ''' Return all miniEngine Motors / Axes that were not yet assigned 
+    ''' an Axis
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function GetUplinkUnusedAxes() As List(Of Axis)
+
+        Dim res As New List(Of Axis)
+
+        For Each axis As Axis In mUplink.Axes
+
+            If Not axis.Used Then
+                res.Add(axis)
+            End If
+
+        Next
+
+        Return res
+
+    End Function
+
+
+    ' =========================================================================
+    ''' <summary>
+    ''' Forwards the Motors / Axes available in the Uplink
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function GetUplinkAxes() As List(Of Axis)
+
+        Return mUplink.Axes
+
+    End Function
+
+
+    ' =========================================================================
+    ''' <summary>
+    ''' Forwards the connection status
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function IsUplinkConnected() As Boolean
+
+        Return mUplink.IsConnected
+
+    End Function
+
+
+    ' =========================================================================
+    ''' <summary>
+    ''' Forwards the Motors / Axes available in the Uplink
+    ''' </summary>
+    ''' <returns></returns>
+    ''' <remarks></remarks>
+    Public Function GetUplinkAxisWithMotornumber(ByVal motorNumber As Integer) As Axis
+
+        Return Axis.GetAxisWithMotorNumber(motorNumber, mUplink.Axes)
+
+        Return Nothing
+
+    End Function
+
+
+
+
 
     ' /////////////////////////////////////////////////////////////////////////
     ' //                                                                     //
@@ -992,37 +1078,47 @@ Public Class Form_Main
     Private Function SendSetupData() As Boolean
 
         Me.Cursor = Cursors.WaitCursor
+        Dim success = True
 
-        ' loop all existing axes of the miniEngine
-        For i As Integer = 0 To mUplink.AxesCount - 1
 
-            ' if we have an axis defined for this miniEngine axis
-            If graph.Axes.Count > i Then
 
-                ' send the curves data
-                If Not mUplink.SendCurves(i, graph.Axes(i).Curves) Then
 
-                    Me.Cursor = Cursors.Default
-                    MessageBox.Show("Data not sent!")
-                    Return False
+        ' loop all motors of the miniengine and delete all existing curves
+        ' by sending a new one with no motion for the complete duration of the setup
+        For Each motor In mUplink.Axes
 
-                End If
+            Dim list As New List(Of QuadBezier)
+            Dim curve As New QuadBezier(Nothing)
 
-            Else
+            curve.Point1 = New Point(0, motor.MotorPosition)
+            curve.Point2 = New Point(0, motor.MotorPosition)
+            curve.Point3 = New Point(0, motor.MotorPosition)
+            curve.Point4 = New Point(CLng(graph.getTotalSetupDuration()), motor.MotorPosition)
 
-                ' send some empty curve data to clear this axis
-                If Not mUplink.SendCurves(i, New List(Of QuadBezier)) Then
+            list.Add(curve)
 
-                    Me.Cursor = Cursors.Default
-                    MessageBox.Show("Data not sent!")
-                    Return False
-
-                End If
-
-            End If
+            ' if no motor was defined for this axis, send en empty curve list
+            ' this alse sets the current motor
+            If Not mUplink.SendCurves(motor.MotorNumber, list) Then success = False
 
         Next
 
+
+        ' loop all axes that were defined
+        For Each axis In graph.Axes
+
+            ' if there was a motor defined for this axis
+            If axis.MotorNumber <> -1 Then
+
+                ' send the motor calibration
+                If Not mUplink.SendCalibration(axis.MotorNumber, axis.Calibration) Then success = False
+
+                ' send the curves data
+                If Not mUplink.SendCurves(axis.MotorNumber, axis.Curves) Then success = False
+
+            End If ' end: motor was defined
+
+        Next
 
         ' now initiate the curve-check to make sure all
         ' depending values are correct (e.g. total run duration)
@@ -1030,7 +1126,13 @@ Public Class Form_Main
 
         Me.Cursor = Cursors.Default
 
+        If Not success Then
+            MessageBox.Show("Data not sent!")
+            Return False
+        End If
+
         Return True
+
 
     End Function
 
@@ -1065,6 +1167,7 @@ Public Class Form_Main
                 graph.Axes.Item(ListView_Axes.SelectedIndices(0)).Name = axis.Name
                 graph.Axes.Item(ListView_Axes.SelectedIndices(0)).Color = axis.Color
                 graph.Axes.Item(ListView_Axes.SelectedIndices(0)).Type = axis.Type
+                graph.Axes.Item(ListView_Axes.SelectedIndices(0)).Calibration = axis.Calibration
 
                 ' repaint the list of axes
                 AxesListUpdate(oldSelection)
@@ -1136,6 +1239,20 @@ Public Class Form_Main
                                             If .Name = "name" Then axis.Name = .Value
                                             If .Name = "color" Then axis.Color = Color.FromArgb(CInt(.Value))
                                             If .Name = "visible" Then axis.Visible = CBool(.Value)
+                                            If .Name = "calibration" Then axis.Calibration = Single.Parse(.Value.Replace(".", Utils.GetDecimalSeperator))
+                                            If .Name = "motor" Then
+                                                axis.MotorNumber = Integer.Parse(.Value)
+
+                                                ' mark the motor as used when already connected
+                                                If mUplink.IsConnected Then
+                                                    Dim mAxis As Axis = GetUplinkAxisWithMotornumber(axis.MotorNumber)
+                                                    If mAxis IsNot Nothing Then
+                                                        mAxis.Used = True
+                                                    End If
+                                                End If
+                                            End If
+
+
                                             If .Name = "type" Then
                                                 If .Value = "linear" Then axis.Type = AxisType.Linear
                                                 If .Value = "radial" Then axis.Type = AxisType.Radial
@@ -1254,6 +1371,12 @@ Public Class Form_Main
                     .WriteAttributeString("name", axis.Name)
                     .WriteAttributeString("color", axis.Color.ToArgb().ToString)
                     .WriteAttributeString("visible", CStr(axis.Visible))
+                    .WriteAttributeString("calibration", CStr(axis.Calibration).Replace(",", "."))
+
+                    If axis.MotorNumber <> -1 Then
+                        .WriteAttributeString("motor", CStr(axis.MotorNumber))
+                    End If
+                    
 
                     Select Case axis.Type
                         Case AxisType.Linear
@@ -1336,6 +1459,22 @@ Public Class Form_Main
 
                 Me.Text = Title + " - Connected"
 
+                ' loop all graph axes and set the motors available as used when
+                ' they are in use there
+                For Each axis In graph.Axes
+
+                    If axis.MotorNumber <> -1 Then
+                        Dim uplinkAxis As Axis = GetUplinkAxisWithMotornumber(axis.MotorNumber)
+
+                        If uplinkAxis IsNot Nothing Then
+                            uplinkAxis.Used = True
+                        End If
+
+                    End If
+
+                Next
+
+
             Else
 
                 ' set the menu point to "Broken connection".
@@ -1382,7 +1521,12 @@ Public Class Form_Main
 
             Dim lvi As New ListViewItem
 
-            lvi.Text = "(" + (counter + 1).ToString + ") - " + axis.Name
+            If axis.MotorNumber = -1 Then
+                ' axis name for no selected motor
+                lvi.Text = " " + axis.Name + " - [NO MOTOR!]"
+            Else
+                lvi.Text = " " + axis.Name + " - [Motor " + (axis.MotorNumber + 1).ToString + "]"
+            End If
             lvi.StateImageIndex = counter
             ListView_Axes.Items.Add(lvi)
 
@@ -1572,6 +1716,9 @@ Public Class Form_Main
         ' Axis selection
         If ListView_Axes.SelectedIndices.Count = 1 Then
 
+            Dim motorNum = graph.Axes(ListView_Axes.SelectedIndices(0)).MotorNumber
+
+
             ' the axis that is selected
             Dim axis As Axis = graph.Axes(ListView_Axes.SelectedIndices(0))
 
@@ -1584,8 +1731,10 @@ Public Class Form_Main
             btn_addSegment.Enabled = True
             btn_DeleteSegment.Enabled = True
 
-            ' if we are connected to the miniEngine
-            If mUplink.IsConnected Then
+            ' if we are connected to the miniEngine and
+            ' a motor was assigned to this axis
+            If mUplink.IsConnected And
+                motorNum <> -1 Then
 
                 edit_moveDistance.Enabled = True
                 btn_moveLeft.Enabled = True
@@ -1655,9 +1804,12 @@ Public Class Form_Main
     ' ==================================================================
     Private Sub NewToolStripMenuItem_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles NewToolStripMenuItem.Click
 
+        mUplink.MarkAllMotorsUnused()
         CreateNew()
 
     End Sub
+
+
 
 
     ' ==================================================================
@@ -1772,16 +1924,5 @@ Public Class Form_Main
     End Function
 
 
-    ' ==================================================================
-    Private Sub ToolStripButton1_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_SendData.Click
-        If (SendSetupData()) Then
-            MessageBox.Show("Uploaded the data successfully", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information)
-        Else
-            MessageBox.Show("Error during the data upload!" + vbNewLine + "Please try again.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Warning)
-        End If
-    End Sub
 
-   
-   
-   
 End Class

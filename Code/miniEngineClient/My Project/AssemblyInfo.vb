@@ -1,4 +1,6 @@
-﻿Imports System
+﻿Imports System.Resources
+
+Imports System
 Imports System.Reflection
 Imports System.Runtime.InteropServices
 
@@ -8,17 +10,17 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("pathDesigner")> 
-<Assembly: AssemblyDescription("")> 
+<Assembly: AssemblyTitle("miniEngine Studio")> 
+<Assembly: AssemblyDescription("miniEngine Studio")> 
 <Assembly: AssemblyCompany("Airic Lenz")> 
-<Assembly: AssemblyProduct("pathDesigner")> 
-<Assembly: AssemblyCopyright("Copyright ©  2014")> 
+<Assembly: AssemblyProduct("miniEngine Studio")> 
+<Assembly: AssemblyCopyright("Airic Lenz 2014")> 
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(True)> 
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("5b9c9c2e-9170-477a-bce7-2387d9fe78b7")> 
+<Assembly: Guid("5b9c9c2e-1978-477a-bce7-2387d9fe78b7")> 
 
 ' Version information for an assembly consists of the following four values:
 '
@@ -31,5 +33,7 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.0.0.0")> 
-<Assembly: AssemblyFileVersion("1.0.0.0")> 
+<Assembly: AssemblyVersion("1.0.1.0")> 
+<Assembly: AssemblyFileVersion("1.0.1.0")> 
+
+<Assembly: NeutralResourcesLanguageAttribute("en")> 
